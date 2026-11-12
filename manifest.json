@@ -1,0 +1,19 @@
+{
+  "name": "健康行動管理ダッシュボード",
+  "short_name": "健康管理",
+  "description": "日々の水分摂取・入浴習慣・休肝日を記録・分析する健康管理アプリ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f172a'/><text x='256' y='350' font-size='280' text-anchor='middle'>💧</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
