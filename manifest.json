@@ -1,7 +1,7 @@
 {
   "name": "健康行動管理ダッシュボード",
   "short_name": "健康管理",
-  "description": "日々の水分摂取・入浴習慣・休肝日を記録・分析する健康管理アプリ",
+  "description": "日々の水分摂取・入浴習慣・休肝日・体調カルテを記録・分析する健康管理アプリ",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -10,10 +10,58 @@
   "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230f172a'/><text x='256' y='350' font-size='280' text-anchor='middle'>💧</text></svg>",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "💧 水分を記録",
+      "short_name": "水分記録",
+      "description": "水分摂取フォームを直接開きます",
+      "url": "./index.html?action=water",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "📷 カメラでAI記録",
+      "short_name": "カメラ記録",
+      "description": "写真撮影・AI解析モードを直接開きます",
+      "url": "./index.html?action=photo",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "🩺 体調・音声カルテ",
+      "short_name": "体調カルテ",
+      "description": "体調・違和感の音声入力＆カルテ記録を開きます",
+      "url": "./index.html?action=condition",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "📊 カレンダー分析",
+      "short_name": "分析タブ",
+      "description": "週間・月間カレンダー分析を直接開きます",
+      "url": "./index.html?tab=analytics",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
