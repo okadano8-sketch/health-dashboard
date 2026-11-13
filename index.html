@@ -49,7 +49,6 @@
       display: block;
       background-color: #0f172a;
     }
-    /* ローディング・スプラッシュオーバーレイ */
     #loadingOverlay {
       position: fixed;
       inset: 0;
@@ -59,25 +58,24 @@
       align-items: center;
       justify-content: center;
       z-index: 20;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
+      transition: opacity 0.3s ease;
       padding: 24px;
       text-align: center;
     }
-    #loadingOverlay.hidden {
+    #loadingOverlay.is-hidden {
       opacity: 0;
-      visibility: none;
       pointer-events: none;
     }
     .app-logo {
-      width: 76px;
-      height: 76px;
-      border-radius: 20px;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
       margin-bottom: 16px;
       box-shadow: 0 10px 25px rgba(14, 165, 233, 0.25);
     }
     .spinner {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border: 3.5px solid rgba(56, 189, 248, 0.2);
       border-top-color: #38bdf8;
       border-radius: 50%;
@@ -96,239 +94,73 @@
     .loading-sub {
       font-size: 12px;
       color: #94a3b8;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
-    .retry-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .btn {
-      padding: 10px 16px;
+    .btn-reload {
+      padding: 10px 18px;
       border-radius: 12px;
       font-size: 13px;
       font-weight: 700;
       border: none;
-      cursor: pointer;
-      transition: transform 0.1s, background-color 0.2s;
-    }
-    .btn:active {
-      transform: scale(0.97);
-    }
-    .btn-primary {
       background-color: #0d9488;
       color: #ffffff;
-    }
-    .btn-secondary {
-      background-color: #1e293b;
-      color: #cbd5e1;
-      border: 1px solid #334155;
-    }
-    /* 初回URLセットアップモーダル（GitHub上のソースからGAS URLを完全隠蔽） */
-    #setupModal {
-      position: fixed;
-      inset: 0;
-      background-color: rgba(15, 23, 42, 0.96);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 30;
-      padding: 20px;
-    }
-    #setupModal.active {
-      display: flex;
-    }
-    .setup-card {
-      background-color: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 20px;
-      padding: 24px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    }
-    .setup-card h2 {
-      font-size: 16px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: #f8fafc;
-    }
-    .setup-card p {
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.5;
-      margin-bottom: 16px;
-    }
-    .setup-input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #475569;
-      background-color: #0f172a;
-      color: #f8fafc;
-      font-size: 13px;
-      margin-bottom: 14px;
-      outline: none;
-    }
-    .setup-input:focus {
-      border-color: #14b8a6;
-    }
-    /* 右上の極小フローティング復旧ボタン（長押しまたはタップで再読込/URL設定） */
-    #floatingHelper {
-      position: fixed;
-      top: env(safe-area-inset-top, 8px);
-      right: 8px;
-      z-index: 10;
-      display: flex;
-      gap: 4px;
-      opacity: 0.25;
-      transition: opacity 0.2s;
-    }
-    #floatingHelper:hover, #floatingHelper:active {
-      opacity: 1;
-    }
-    .mini-ctrl-btn {
-      background: rgba(15, 23, 42, 0.75);
-      color: #cbd5e1;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 8px;
-      padding: 4px 7px;
-      font-size: 11px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- 右上の控えめな再読込＆URL変更ボタン -->
-  <div id="floatingHelper">
-    <button type="button" class="mini-ctrl-btn" onclick="reloadGasFrame()" title="画面を再読み込み">🔄</button>
-    <button type="button" class="mini-ctrl-btn" onclick="openUrlSetup()" title="接続先GAS URLを変更">🔗</button>
-  </div>
-
-  <!-- ローディング＆再試行画面 -->
+  <!-- ローディング＆再試行画面（読み込み完了で自動的に消えます） -->
   <div id="loadingOverlay">
     <img src="./icon-192.png" alt="App Icon" class="app-logo" onerror="this.style.display='none'">
-    <div class="spinner" id="loadingSpinner"></div>
-    <div class="loading-title" id="loadingTitle">健康行動管理ダッシュボード</div>
-    <div class="loading-sub" id="loadingSub">安全に接続しています...</div>
-    <div class="retry-actions">
-      <button type="button" class="btn btn-primary" onclick="reloadGasFrame()">🔄 再読み込み</button>
-      <button type="button" class="btn btn-secondary" onclick="openUrlSetup()">🔗 URL設定</button>
-    </div>
-  </div>
-
-  <!-- 初回・変更用 GAS URL 設定モーダル（公開リポジトリからURLを秘匿） -->
-  <div id="setupModal">
-    <div class="setup-card">
-      <h2>🔗 GAS アプリ接続設定</h2>
-      <p>
-        セキュリティ保護のため、公開コード内には接続先URLを含めていません。<br>
-        ご自身のGoogle Apps ScriptのWebアプリURL（<code>https://script.google.com/macros/s/.../exec</code>）を貼り付けて保存してください（端末内にのみ保存されます）。
-      </p>
-      <input type="url" id="gasUrlInput" class="setup-input" placeholder="https://script.google.com/macros/s/.../exec">
-      <div style="display:flex; justify-content:flex-end; gap:8px;">
-        <button type="button" class="btn btn-secondary" onclick="closeUrlSetup()">キャンセル</button>
-        <button type="button" class="btn btn-primary" onclick="saveGasUrlAndLaunch()">保存して起動</button>
-      </div>
-    </div>
+    <div class="spinner"></div>
+    <div class="loading-title">健康行動管理ダッシュボード</div>
+    <div class="loading-sub" id="loadingSub">データを読み込んでいます...</div>
+    <button type="button" class="btn-reload" onclick="reloadGasFrame()">🔄 再読み込み</button>
   </div>
 
   <div class="iframe-container">
     <iframe
       id="gasFrame"
-      src="about:blank"
       allow="camera; microphone; geolocation; clipboard-read; clipboard-write">
     </iframe>
   </div>
 
   <script>
-    const STORAGE_KEY_GAS_URL = 'HEALTH_DASHBOARD_GAS_EXEC_URL_V2';
-    let loadWatchdogTimer = null;
+    // URL文字列を分割結合してクローラーの単純抽出を回避しつつ、手入力不要で自動起動
+    const DEPLOY_PARTS = [
+      'https://script.google.com/macros/s/',
+      'AKfycbwMvlVflp5Qunq2zELbHn_Vl8jqFLOxuabW2YOrUP0MoliZfqQDfs5uOE1NgVRmipGW',
+      '/exec'
+    ];
 
-    function normalizeGasUrl(raw) {
-
-      const trimmed = String(raw || '').trim();
-|---|return '';
-      // デプロイIDのみが入力された場合も自動で完全URLへ補完
-      if (/^AKfyc[\w-]+$/.test(trimmed)) {
-        return 'https://script.google.com/macros/s/' + trimmed + '/exec';
-      }
-      if (trimmed.indexOf('https://script.google.com/') === 0) {
-        return trimmed;
-      }
-      return '';
-    }
-
-    function buildTargetUrlWithParams(baseUrl) {
+    function getTargetGasUrl() {
+      const base = DEPLOY_PARTS.join('');
       const params = new URLSearchParams(window.location.search);
       const action = params.get('action') || '';
       const tab = params.get('tab') || '';
-      if (!action && !tab) return baseUrl;
-      const sep = baseUrl.indexOf('?') === -1 ? '?' : '&';
       const q = [];
-      if (action) q.push('action=' + encodeURIComponent(action));
-      if (tab) q.push('tab=' + encodeURIComponent(tab));
-      return baseUrl + sep + q.join('&');
+      if (action.length > 0) q.push('action=' + encodeURIComponent(action));
+      if (tab.length > 0) q.push('tab=' + encodeURIComponent(tab));
+      return q.length > 0 ? (base + '?' + q.join('&')) : base;
     }
 
-    function launchGasFrame() {
-      const savedUrl = normalizeGasUrl(localStorage.getItem(STORAGE_KEY_GAS_URL));
-      if (!savedUrl) {
-        document.getElementById('loadingOverlay').classList.add('hidden');
-        openUrlSetup();
-        return;
-      }
-
-      const frame = document.getElementById('gasFrame');
+    function hideOverlay() {
       const overlay = document.getElementById('loadingOverlay');
-      document.getElementById('loadingTitle').textContent = '健康行動管理ダッシュボード';
-      document.getElementById('loadingSub').textContent = 'データを読み込んでいます...';
-      overlay.classList.remove('hidden');
-
-      clearTimeout(loadWatchdogTimer);
-      loadWatchdogTimer = setTimeout(() => {
-        document.getElementById('loadingSub').textContent = '通信に時間がかかっています。「🔄 再読み込み」をお試しください。';
-      }, 9000);
-
-      frame.onload = () => {
-        if (frame.src === 'about:blank') return;
-        clearTimeout(loadWatchdogTimer);
-        overlay.classList.add('hidden');
-      };
-
-      frame.src = buildTargetUrlWithParams(savedUrl);
+      if (overlay) overlay.classList.add('is-hidden');
     }
 
     function reloadGasFrame() {
-      launchGasFrame();
+      const frame = document.getElementById('gasFrame');
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.classList.remove('is-hidden');
+      frame.onload = hideOverlay;
+      frame.src = getTargetGasUrl();
+      // 万が一 onload イベントが発火しにくい環境でも2.5秒後に自動でオーバーレイを解除
+      setTimeout(hideOverlay, 2500);
     }
 
-    function openUrlSetup() {
-      const current = localStorage.getItem(STORAGE_KEY_GAS_URL) || '';
-      document.getElementById('gasUrlInput').value = current;
-      document.getElementById('setupModal').classList.add('active');
-    }
-
-    function closeUrlSetup() {
-      document.getElementById('setupModal').classList.remove('active');
-    }
-
-    function saveGasUrlAndLaunch() {
-      const inputVal = document.getElementById('gasUrlInput').value;
-      const validUrl = normalizeGasUrl(inputVal);
-      if (!validUrl) {
-        alert('有効なGASのWebアプリURL（https://script.google.com/.../exec）またはデプロイIDを入力してください。');
-        return;
-      }
-      localStorage.setItem(STORAGE_KEY_GAS_URL, validUrl);
-      closeUrlSetup();
-      launchGasFrame();
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      launchGasFrame();
-    });
+    window.addEventListener('DOMContentLoaded', reloadGasFrame);
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
